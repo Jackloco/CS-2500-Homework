@@ -9,7 +9,7 @@
        (< (+ base (random random-upper)) too-big)))
 ;;the random is being called three times. the randoms will not have the same seed giving wildly
 ;;different answers
-;;this is a test
+  
 
 ; A Fish is a (make-fish String String NonNegNumber)
 (define-struct fish [species color weight])
@@ -31,3 +31,5 @@
 (define (PiSamples X Y)
   ((string-append(number->string X)(number->string Y))))
 
+
+;;
