@@ -36,7 +36,7 @@
 ; minutes of delay and reason, or that the train has been cancelled
 
 ;delay-template: delay ->???
-(define (delay-template d)
+#;(define (delay-template d)
   (cond [(integer? d)...]
         [(string? d)...]
         [(delay? d)
@@ -46,15 +46,14 @@
 
 ;;announce: Number String TrainStatus -> String
 ;;takes in trainNumber destination and any status of the train to post a message of the train
-(check-expect (announce 9 "Portland" (make-delay 1)) "Train 9 to Portland is 1 minute away.")
-(check-expect (announce 123 "Newark" (make-delay "arriving")) "Train 123 to Newark is arriving.")
+(check-expect (announce 9 "Portland" 1) "Train 9 to Portland is 1 minutes away.")
+(check-expect (announce 123 "Newark" "arriving") "Train 123 to Newark is arriving.")
 (check-expect (announce 82 "Philadelphia"
-                        (make-delay "boarding")) "Train 82 to Philadelphia is boarding.")
+                        "boarding") "Train 82 to Philadelphia is boarding.")
 (check-expect (announce 76 "Chicago"
                         (make-delay "signaling error" "10"))
               "Train 76 to Chicago is delayed 10 minutes due to signaling error.")
-(check-expect (announce 9348 "Boston" (make-delay false)) "Train 9348 to Boston is cancelled.")
-
+(check-expect (announce 9348 "Boston" false) "Train 9348 to Boston is cancelled.")
 
 (define (announce trnNum dest status)
   (string-append "Train " (number->string trnNum) " to " dest " is "
@@ -63,5 +62,51 @@
                         [(delay? status)
                          (string-append "delayed " (delay-minutes status) " minutes due to "
                                         (delay-reason status))]
-                        [(false? status) " cancelled"])"."))
+                        [(false? status) "cancelled"])"."))
+;ex4
+(define-struct red [ticks-left])
+(define-struct blue [ticks-left])
+ 
+; A ReflexGameState (RGS) is one of:
+; - (make-red Nat)
+; - (make-blue Nat)
+; and represents the current state of the game,
+; either red or blue, and how many ticks are left
+; to show in that state before switching to the other
 
+#;(define (ReflexGameState-temp state)
+  (cond [(red? state)
+         (red-ticks-left state)...]
+        [(blue? state)
+         (blue-ticks-left state)...]))
+
+(define RF1 (make-red 140))
+(define RF2 (make-blue 14))
+
+;relfexes: ReflexGameState -> reflexes
+;makes an image for each RGS until it's own tick time runs out, then switches to next
+#;(define (reflexes state)
+  (big-bang state
+    [on-tick compute-next]
+    [on-key any-key]
+    [stop-when pressed-key]
+    [to-draw ]))
+
+;compute-next: state->state
+;counts down tick and flips to other tick countdown when the current one hits zero
+(check-expect(compute-next (make-red 0)) (make-blue 14))
+(check-expect(compute-next (make-blue 0)) (make-red 140))
+(check-expect(compute-next (make-red 134)) (make-red 133))
+(check-expect(compute-next (make-blue 12)) (make-blue 11))
+(define (compute-next state)
+  (cond [(red? state)
+         (if (> (red-ticks-left state) 0)
+             (make-red (- (red-ticks-left state) 1))
+             (make-blue 14))]
+        [(blue? state)
+         (if (> (blue-ticks-left state) 0)
+             (make-blue (- (blue-ticks-left state) 1))
+             (make-red 140))]))
+
+(define (any-key w a-key)
+  )
