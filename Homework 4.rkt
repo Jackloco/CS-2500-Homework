@@ -85,16 +85,31 @@
 (define red-screen (rectangle 500 500 "solid" "red"))
 (define blue-screen (rectangle 500 500 "solid" "blue"))
 
-;relfexes: ReflexGameState -> reflexes
-;makes an image for each RGS until it's own tick time runs out, then switches to next
-(define (reflexes state)
-    (big-bang state
-      [on-tick compute-next]
-      [on-key any-key]
-      [stop-when pressed-key]
-      [to-draw red-blue-red]))
+;A State is one of:
+;- RGS
+;- Boolean
+;state can either be an RGS struct or a boolean
 
-;compute-next: state->state
+#;(define (state-temp state)
+    (cond [((or (red? state) (blue? state)))...]
+          [(boolean? state)...]))
+
+(define state1 (make-red 140))
+(define state2 (make-blue 14))
+(define state3 false)
+(define state4 true)
+
+;relfexes: State -> State
+;makes an image for each RGS until it's own tick time runs out, then switches to next
+
+(define (reflexes state)
+  (big-bang state
+    [on-tick compute-next]
+    [on-key any-key]
+    [stop-when pressed-key]
+    [to-draw red-blue-red]))
+
+;compute-next: State->State
 ;counts down tick and flips to other tick countdown when the current one hits zero
 (check-expect(compute-next (make-red 0)) (make-blue 14))
 (check-expect(compute-next (make-blue 0)) (make-red 140))
@@ -109,7 +124,7 @@
          (if (> (blue-ticks-left state) 0)
              (make-blue (- (blue-ticks-left state) 1))
              (make-red 140))]))
-;any-key: World -> World
+;any-key: State KeyEvent -> State
 ;will switch state from RGS to boolean if key is pressed
 (check-expect (any-key true "w") true)
 (check-expect (any-key false "e") false)
@@ -119,17 +134,17 @@
   (cond
     [(boolean? state) state]
     [else (blue? state)]))
-;pressed-key: World->World
+;pressed-key: State -> State
 ;this will only work if the world state has been changed to a boolean, false or true will kill
 (check-expect (pressed-key true) true)
 (check-expect (pressed-key false) true)
 (define (pressed-key state)
   (boolean? state))
-  ;;(cond
-    ;;[(boolean? state) true]
-    ;;[else state]))
+;;(cond
+;;[(boolean? state) true]
+;;[else state]))
 
-;red-blue-red: World -> World
+;red-blue-red: State -> State
 ;will draw red or blue depending on which color is present in state
 (check-expect (red-blue-red (make-red 44)) red-screen)
 (check-expect (red-blue-red (make-blue 10)) blue-screen)
@@ -153,20 +168,63 @@
 ; or a square with side length and center
 
 #;(define (shape-temp radl center)
-  (cons
-   [(circ? radl center)...]
-   [(sq? radl center)...]))
+    (cons
+     [(circ? radl center)...]
+     [(sq? radl center)...]))
 
-#;(define (blink state)
-    (big-bang state
-      [on-mouse down-press]
-      [to-draw on-screen]))
+;a State is a (make-st Shape Boolean)
+(define-struct st [shape fill])
 
-(define (down-press state x y event)
-  (string=? event "button-up"))
+#;(define (shape-state-temp state)
+    (shape-temp (shape-state-shape state))...
+    (shape-state-fill state)...)
 
-(define (on-screen ))
-  
+(define SHAPE1 (make-circ 30 30))
+(define SHAPE2 (make-sq 15 50))
+
+(define SHAPE-STATE1 (make-st SHAPE1 true))
+(define SHAPE-STATE2 (make-st SHAPE1 false))
+(define SHAPE-STATE3 (make-st SHAPE2 true))
+(define SHAPE-STATE4 (make-st SHAPE2 false))
+
+;blink: State -> State 
+(define (blink st)
+  (big-bang st
+    [on-mouse down-press]
+    [to-draw draw-shapes]))
+;down-press: State Num Num MouseEvent -> State
+(define (down-press st x y event)
+  (cond
+    [(and(string=? event "button-up")
+         (in-shape? x y st)) (make-st (st-shape st)
+                                            (not (st-fill st)))]
+    [(and(string=? event "button-up")
+         (not(in-shape? x y st))) (make-st (change-center x y (st-shape st))
+                                                 (st-fill st))]
+    [else st]
+    ))
+
+;draw-shapes: State -> Image 
+(define (draw-shapes st)
+  (cond
+    [(circ? st) draw-circle]
+    [(sq? st) draw-square]))
+
+;in-shape?: Num Num State -> Boolean
+; checks if the click is in the shape
+(define (in-shape? x y st)
+  (cond
+    [(circ? (st-shape st)) (< (circ-radius (st-shape st)) (sqrt (+ (sqr (- x (posn-x(circ-center (st-shape st)))))
+                                                                         (sqr (- y (posn-y(circ-center (st-shape st))))))))]
+    [(sq? (st-shape st)) (edges (st-shape st))]))
+
+;edges: Num Num square -> Boolean
+;finds edges of the square depending on center and length
+(define (edges x y square)
+  (and (and(< x (+ (/ 2 (sq-radl square)) (posn-x(sq-center square))))
+           (> x (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))
+       (and (< y (+ (/ 2 (sq-radl square)) (posn-x(sq-center square))))
+            (> y (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))))
 
 ;ex 6
 (define-struct building [width height color right])
