@@ -203,6 +203,7 @@
                                                  (st-fill st))]
     [else st]
     ))
+;change-center
 
 ;draw-shapes: State -> Image 
 (define (draw-shapes st)
@@ -225,6 +226,7 @@
            (> x (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))
        (and (< y (+ (/ 2 (sq-radl square)) (posn-x(sq-center square))))
             (> y (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))))
+
 
 ;ex 6
 (define-struct building [width height color right])
