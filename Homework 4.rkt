@@ -37,12 +37,12 @@
 
 ;delay-template: delay ->???
 #;(define (delay-template d)
-  (cond [(integer? d)...]
-        [(string? d)...]
-        [(delay? d)
-         (... (delay-reason d)
-              (delay-minutes d) ...)]
-        [(false? d)...]))
+    (cond [(integer? d)...]
+          [(string? d)...]
+          [(delay? d)
+           (... (delay-reason d)
+                (delay-minutes d) ...)]
+          [(false? d)...]))
 
 ;;announce: Number String TrainStatus -> String
 ;;takes in trainNumber destination and any status of the train to post a message of the train
@@ -58,11 +58,11 @@
 (define (announce trnNum dest status)
   (string-append "Train " (number->string trnNum) " to " dest " is "
                  (cond [(integer? status) (string-append (number->string status) " minutes away")]
-                        [(string? status) status]
-                        [(delay? status)
-                         (string-append "delayed " (delay-minutes status) " minutes due to "
-                                        (delay-reason status))]
-                        [(false? status) "cancelled"])"."))
+                       [(string? status) status]
+                       [(delay? status)
+                        (string-append "delayed " (delay-minutes status) " minutes due to "
+                                       (delay-reason status))]
+                       [(false? status) "cancelled"])"."))
 ;ex4
 (define-struct red [ticks-left])
 (define-struct blue [ticks-left])
@@ -75,22 +75,24 @@
 ; to show in that state before switching to the other
 
 #;(define (ReflexGameState-temp state)
-  (cond [(red? state)
-         (red-ticks-left state)...]
-        [(blue? state)
-         (blue-ticks-left state)...]))
+    (cond [(red? state)
+           (red-ticks-left state)...]
+          [(blue? state)
+           (blue-ticks-left state)...]))
 
 (define RF1 (make-red 140))
 (define RF2 (make-blue 14))
+(define red-screen (rectangle 500 500 "solid" "red"))
+(define blue-screen (rectangle 500 500 "solid" "blue"))
 
 ;relfexes: ReflexGameState -> reflexes
 ;makes an image for each RGS until it's own tick time runs out, then switches to next
-#;(define (reflexes state)
-  (big-bang state
-    [on-tick compute-next]
-    [on-key any-key]
-    [stop-when pressed-key]
-    [to-draw ]))
+(define (reflexes state)
+    (big-bang state
+      [on-tick compute-next]
+      [on-key any-key]
+      [stop-when pressed-key]
+      [to-draw red-blue-red]))
 
 ;compute-next: state->state
 ;counts down tick and flips to other tick countdown when the current one hits zero
@@ -107,6 +109,70 @@
          (if (> (blue-ticks-left state) 0)
              (make-blue (- (blue-ticks-left state) 1))
              (make-red 140))]))
+;any-key: World -> World
+;will switch state from RGS to boolean if key is pressed
+(check-expect (any-key true "w") true)
+(check-expect (any-key false "e") false)
+(check-expect (any-key (make-red 67) "r") false)
+(check-expect (any-key (make-blue 4) "t") true)
+(define (any-key state a-key)
+  (cond
+    [(boolean? state) state]
+    [else (blue? state)]))
+;pressed-key: World->World
+;this will only work if the world state has been changed to a boolean, false or true will kill
+(check-expect (pressed-key true) true)
+(check-expect (pressed-key false) true)
+(define (pressed-key state)
+  (boolean? state))
+  ;;(cond
+    ;;[(boolean? state) true]
+    ;;[else state]))
 
-(define (any-key w a-key)
-  )
+;red-blue-red: World -> World
+;will draw red or blue depending on which color is present in state
+(check-expect (red-blue-red (make-red 44)) red-screen)
+(check-expect (red-blue-red (make-blue 10)) blue-screen)
+(define (red-blue-red state)
+  (cond
+    [(red? state) red-screen]
+    [(blue? state) blue-screen]))
+
+;ex5
+; A Posn is a (make-posn Number Number)
+; and represents a 2D position
+ 
+(define-struct circ [radius center])
+(define-struct sq [side center])
+
+
+; A Shape is one of...
+; - (make-circ PosNumber Posn)
+; - (make-sq PosNumber Posn)
+; and represents a cirle with a radius and center
+; or a square with side length and center
+
+#;(define (shape-temp radl center)
+  (cons
+   [(circ? radl center)...]
+   [(sq? radl center)...]))
+
+#;(define (blink state)
+    (big-bang state
+      [on-mouse down-press]
+      [to-draw on-screen]))
+
+(define (down-press state x y event)
+  (string=? event "button-up"))
+
+(define (on-screen ))
+  
+
+;ex 6
+(define-struct building [width height color right])
+; A Skyline is one of:
+; - false
+; - (make-building PosInteger PosInteger String Skyline) 
+; and represents either an empty skyle or a building with
+; a width and height in pixels, the color of the building, and the
+; rest of the skyline to the right of the building
