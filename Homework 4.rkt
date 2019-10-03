@@ -223,7 +223,7 @@
 (define SHAPE-STATE3 (make-st SHAPE2 true))
 (define SHAPE-STATE4 (make-st SHAPE2 false))
 
-;blink: State -> State 
+;blink: State -> State
 (define (blink st)
   (big-bang st
     [on-mouse up-press]
@@ -260,7 +260,7 @@
 ;draw-circle : State -> Image
 ;when called from draw-shapes, it will draw a circle
 (define (draw-circle s)
-  (place-image (circle (circ-radius (st-shape s)) (if (boolean=? (st-fill s) true) "outline" "solid")
+  (place-image (circle (circ-radius (st-shape s)) (if (st-fill s) "outline" "solid")
                        "purple")
                (posn-x (circ-center (st-shape s)))
                (posn-y (circ-center (st-shape s)))
@@ -268,7 +268,7 @@
 ;draw-square : State -> Image
 ;when called from draw-shapes, it will draw a square
 (define (draw-square s)
-  (place-image (square (sq-side (st-shape s)) (if (boolean=? (st-fill s) true) "outline" "solid")
+  (place-image (square (sq-side (st-shape s)) (if (st-fill s) "outline" "solid")
                        "purple")
                (posn-x (sq-center (st-shape s)))
                (posn-y (sq-center (st-shape s)))
@@ -314,3 +314,7 @@
     [()]))
 
 ;ex 7
+(define-struct moon [distance mass])
+(define-struct planet [name distance 
+; A Planet is a (make-planet String Number Moon)
+; A Moon is a (make-moon 
