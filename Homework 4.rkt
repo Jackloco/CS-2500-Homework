@@ -205,8 +205,8 @@
 ; shape-temp : Shape -> ???
 #;(define (shape-temp radl center)
     (cons
-     [(circ? radl center)...]
-     [(sq? radl center)...]))
+     [(circ? radius center)...]
+     [(sq? side center)...]))
 
 ;a State is a (make-st Shape Boolean)
 (define-struct st [shape fill])
@@ -242,6 +242,7 @@
 
 ;change-center Num Num Shape -> Shape
 ;takes in shape from down-press but only the object where the click was outside the object
+
 (define (change-center x y s)
   (cond
     [(circ? s) (make-circ (circ-radius s) (make-posn x y))]
@@ -277,6 +278,10 @@
 
 ;in-shape?: Num Num State -> Boolean
 ;checks if the click is in the shape
+(check-expect (in-shape? 50 50 SHAPE-STATE1) true)
+(check-expect (in-shape? 100 100 SHAPE-STATE1) false)
+(check-expect (in-shape? 50 50 SHAPE-STATE2) true)
+(check-expect (in-shape? 100 100 SHAPE-STATE2) false)
 (define (in-shape? x y st)
   (cond
     [(circ? (st-shape st)) (> (circ-radius (st-shape st))
@@ -287,6 +292,8 @@
 
 ;edges: Num Num square -> Boolean
 ;finds edges of the square depending on center and length
+(check-expect (edges 40 40 (make-sq 20 (make-posn 50 50))) true)
+(check-expect (edges 100 100 (make-sq 20 (make-posn 50 50))) false)
 (define (edges x y square)
   (and (and(< x (+ (/ 2 (sq-side square)) (posn-x(sq-center square))))
            (> x (- (/ 2 (sq-side square)) (posn-x(sq-center square)))))
@@ -363,7 +370,7 @@
 (check-expect (planet-bigger-moon? PLANET-2 300) true)
 (check-expect (planet-bigger-moon? PLANET-3 50) true)
 
-(define (planet-bigger-moon p n)
+(define (planet-bigger-moon? p n)
   (or
    (> (moon-mass (planet-firstmoon p)) n)
    (> (moon-mass (planet-secondmoon p)) n)))
