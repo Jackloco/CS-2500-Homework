@@ -179,8 +179,8 @@
     (shape-temp (shape-state-shape state))...
     (shape-state-fill state)...)
 
-(define SHAPE1 (make-circ 30 30))
-(define SHAPE2 (make-sq 15 50))
+(define SHAPE1 (make-circ 30 make-posn(30 30)))
+(define SHAPE2 (make-sq 15 make-posn(50 50)))
 
 (define SHAPE-STATE1 (make-st SHAPE1 true))
 (define SHAPE-STATE2 (make-st SHAPE1 false))
@@ -190,10 +190,11 @@
 ;blink: State -> State 
 (define (blink st)
   (big-bang st
-    [on-mouse down-press]
+    [on-mouse up-press]
     [to-draw draw-shapes]))
-;down-press: State Num Num MouseEvent -> State
-(define (down-press st x y event)
+;up-press: State Num Num MouseEvent -> State
+;checks to see if the release of the mouse is on or off the shape
+(define (up-press st x y event)
   (cond
     [(and(string=? event "button-up")
          (in-shape? x y st)) (make-st (st-shape st)
@@ -201,18 +202,22 @@
     [(and(string=? event "button-up")
          (not(in-shape? x y st))) (make-st (change-center x y (st-shape st))
                                            (st-fill st))]
-    [else st]
-    ))
-;change-center
+    [else st]))
 
-;draw-shapes: State -> Image 
+;change-center Num Num Shape -> Shape
+;takes in shape from down-press but only the object where the click was outside the object
+(define (change-center x y object)
+  (make-sq((sq-radl object) make-posn(x y))))
+
+;draw-shapes: State -> Image
+;will either draw a circle or a square
 (define (draw-shapes st)
   (cond
     [(circ? st) draw-circle]
     [(sq? st) draw-square]))
 
 ;in-shape?: Num Num State -> Boolean
-; checks if the click is in the shape
+;checks if the click is in the shape
 (define (in-shape? x y st)
   (cond
     [(circ? (st-shape st)) (< (circ-radius (st-shape st))
@@ -229,6 +234,8 @@
             (> y (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))))
 
 
+
+
 ;ex 6
 (define-struct building [width height color right])
 ; A Skyline is one of:
@@ -237,3 +244,9 @@
 ; and represents either an empty skyle or a building with
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
+
+(define BLD1 (make-building 100 500 "blue" Skyline))
+(define BLD2 (make-building 250 400 "red" Skyline))
+(define BLD3 (make-building 500 1000 "pink" Skyline))
+
+;ex 7
