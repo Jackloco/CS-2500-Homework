@@ -303,10 +303,10 @@
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
 
-;;(define SKY1 (make-building 100 500 "blue" Skyline))
-;;(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
-;;(define SKY3 (make-building 500 1000 "pink"
-                            ;;(make-building 250 400 "red" (make-building 100 500 "blue" false))))
+(define SKY1 (make-building 100 500 "blue" Skyline))
+(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
+(define SKY3 (make-building 500 1000 "pink"
+                            (make-building 250 400 "red" (make-building 100 500 "blue" false))))
 
 #;(define (Skyline-temp skah)
   (cond
