@@ -179,8 +179,8 @@
     (shape-temp (shape-state-shape state))...
     (shape-state-fill state)...)
 
-(define SHAPE1 (make-circ 30 make-posn(30 30)))
-(define SHAPE2 (make-sq 15 make-posn(50 50)))
+(define SHAPE1 (make-circ 30 (make-posn 30 30)))
+(define SHAPE2 (make-sq 15 (make-posn 50 50)))
 
 (define SHAPE-STATE1 (make-st SHAPE1 true))
 (define SHAPE-STATE2 (make-st SHAPE1 false))
@@ -234,8 +234,6 @@
             (> y (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))))
 
 
-
-
 ;ex 6
 (define-struct building [width height color right])
 ; A Skyline is one of:
@@ -245,8 +243,14 @@
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
 
-(define BLD1 (make-building 100 500 "blue" Skyline))
-(define BLD2 (make-building 250 400 "red" Skyline))
-(define BLD3 (make-building 500 1000 "pink" Skyline))
+(define SKY1 (make-building 100 500 "blue" Skyline))
+(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
+(define SKY3 (make-building 500 1000 "pink"
+                            (make-building 250 400 "red" (make-building 100 500 "blue" false))))
+
+(define (Skyline-temp skah)
+  (cond
+    [(false? skah)...]
+    [()]))
 
 ;ex 7
