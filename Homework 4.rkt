@@ -154,11 +154,43 @@
     [(blue? state) blue-screen]))
 
 ;ex5
+; (define-struct posn [x-pos y-pos])
 ; A Posn is a (make-posn Number Number)
 ; and represents a 2D position
- 
+
+(define POSN-0 (make-posn 0 0))
+(define POSN-1 (make-posn 1 3))
+(define POSN-2 (make-posn 4 5))
+
+; posn-temp : Posn -> ???
+#;(define (posn-temp posn)
+    (... (posn-xpos posn)...
+         (posn-ypos posn)...))
+
+
 (define-struct circ [radius center])
+; A Circle is a (make-circ Number Posn)
+; and represents the size and location of a circle
+(define CIRC-1 (make-circ 10 POSN-0))
+(define CIRC-2 (make-circ 5 POSN-2))
+
+; circ-temp : Circle -> ???
+#;(define (circ-temp c)
+    (... (circ-radius c)...
+         (posn-xpos (circ-center c))...
+         (posn-ypos (circ-center c))...))
+
 (define-struct sq [side center])
+; A Square is a (make-sq Number Posn)
+; and represents the size and location of a square
+(define SQ-1 (make-sq 4 POSN-1))
+(define SQ-2 (make-sq 20 POSN-0))
+
+; square-temp : Square -> ???
+#;(define (square-temp s)
+    (... (sq-side s)...
+         (posn-xpos (sq-center s))...
+         (posn-ypos (sq-center s))...))
 
 
 ; A Shape is one of...
@@ -167,6 +199,10 @@
 ; and represents a cirle with a radius and center
 ; or a square with side length and center
 
+(define SHAPE-1 CIRC-1)
+(define SHAPE-2 SQ-1)
+
+; shape-temp : Shape -> ???
 #;(define (shape-temp radl center)
     (cons
      [(circ? radl center)...]
@@ -206,32 +242,56 @@
 
 ;change-center Num Num Shape -> Shape
 ;takes in shape from down-press but only the object where the click was outside the object
-(define (change-center x y object)
-  (make-sq((sq-radl object) make-posn(x y))))
+(define (change-center x y s)
+  (cond
+    [(circ? s) (make-circ (circ-radius s) (make-posn x y))]
+    [(sq? s) (make-sq (sq-side s) (make-posn x y))]))
+
 
 ;draw-shapes: State -> Image
 ;will either draw a circle or a square
 (define (draw-shapes st)
   (cond
-    [(circ? st) draw-circle]
-    [(sq? st) draw-square]))
+    [(circ? (st-shape st)) (draw-circle st)]
+    [(sq? (st-shape st)) (draw-square st)]))
+
+
+(define BG (square 600 "solid" "white"))
+;draw-circle : State -> Image
+;when called from draw-shapes, it will draw a circle
+(define (draw-circle s)
+  (place-image (circle (circ-radius (st-shape s)) (if (boolean=? (st-fill s) true) "outline" "solid")
+                       "purple")
+               (posn-x (circ-center (st-shape s)))
+               (posn-y (circ-center (st-shape s)))
+               BG))
+;draw-square : State -> Image
+;when called from draw-shapes, it will draw a square
+(define (draw-square s)
+  (place-image (square (sq-side (st-shape s)) (if (boolean=? (st-fill s) true) "outline" "solid")
+                       "purple")
+               (posn-x (sq-center (st-shape s)))
+               (posn-y (sq-center (st-shape s)))
+               BG))
+
 
 ;in-shape?: Num Num State -> Boolean
 ;checks if the click is in the shape
 (define (in-shape? x y st)
   (cond
-    [(circ? (st-shape st)) (< (circ-radius (st-shape st))
+    [(circ? (st-shape st)) (> (circ-radius (st-shape st))
                               (sqrt (+ (sqr (- x (posn-x(circ-center (st-shape st)))))
                                        (sqr (- y (posn-y(circ-center (st-shape st))))))))]
-    [(sq? (st-shape st)) (edges (x y st-shape st))]))
+    [(sq? (st-shape st)) (edges x y (st-shape st))]))
+
 
 ;edges: Num Num square -> Boolean
 ;finds edges of the square depending on center and length
 (define (edges x y square)
-  (and (and(< x (+ (/ 2 (sq-radl square)) (posn-x(sq-center square))))
-           (> x (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))
-       (and (< y (+ (/ 2 (sq-radl square)) (posn-x(sq-center square))))
-            (> y (- (/ 2 (sq-radl square)) (posn-x(sq-center square)))))))
+  (and (and(< x (+ (/ 2 (sq-side square)) (posn-x(sq-center square))))
+           (> x (- (/ 2 (sq-side square)) (posn-x(sq-center square)))))
+       (and (< y (+ (/ 2 (sq-side square)) (posn-x(sq-center square))))
+            (> y (- (/ 2 (sq-side square)) (posn-x(sq-center square)))))))
 
 
 ;ex 6
@@ -243,12 +303,12 @@
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
 
-(define SKY1 (make-building 100 500 "blue" Skyline))
-(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
-(define SKY3 (make-building 500 1000 "pink"
-                            (make-building 250 400 "red" (make-building 100 500 "blue" false))))
+;;(define SKY1 (make-building 100 500 "blue" Skyline))
+;;(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
+;;(define SKY3 (make-building 500 1000 "pink"
+                            ;;(make-building 250 400 "red" (make-building 100 500 "blue" false))))
 
-(define (Skyline-temp skah)
+#;(define (Skyline-temp skah)
   (cond
     [(false? skah)...]
     [()]))
