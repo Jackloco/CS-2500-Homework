@@ -197,10 +197,10 @@
   (cond
     [(and(string=? event "button-up")
          (in-shape? x y st)) (make-st (st-shape st)
-                                            (not (st-fill st)))]
+                                      (not (st-fill st)))]
     [(and(string=? event "button-up")
          (not(in-shape? x y st))) (make-st (change-center x y (st-shape st))
-                                                 (st-fill st))]
+                                           (st-fill st))]
     [else st]
     ))
 ;change-center
@@ -215,8 +215,9 @@
 ; checks if the click is in the shape
 (define (in-shape? x y st)
   (cond
-    [(circ? (st-shape st)) (< (circ-radius (st-shape st)) (sqrt (+ (sqr (- x (posn-x(circ-center (st-shape st)))))
-                                                                         (sqr (- y (posn-y(circ-center (st-shape st))))))))]
+    [(circ? (st-shape st)) (< (circ-radius (st-shape st))
+                              (sqrt (+ (sqr (- x (posn-x(circ-center (st-shape st)))))
+                                       (sqr (- y (posn-y(circ-center (st-shape st))))))))]
     [(sq? (st-shape st)) (edges (st-shape st))]))
 
 ;edges: Num Num square -> Boolean
