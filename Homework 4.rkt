@@ -223,7 +223,7 @@
     [(circ? (st-shape st)) (< (circ-radius (st-shape st))
                               (sqrt (+ (sqr (- x (posn-x(circ-center (st-shape st)))))
                                        (sqr (- y (posn-y(circ-center (st-shape st))))))))]
-    [(sq? (st-shape st)) (edges (st-shape st))]))
+    [(sq? (st-shape st)) (edges (x y st-shape st))]))
 
 ;edges: Num Num square -> Boolean
 ;finds edges of the square depending on center and length
