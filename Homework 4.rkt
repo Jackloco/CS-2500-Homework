@@ -303,10 +303,10 @@
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
 
-(define SKY1 (make-building 100 500 "blue" Skyline))
-(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
-(define SKY3 (make-building 500 1000 "pink"
-                            (make-building 250 400 "red" (make-building 100 500 "blue" false))))
+;;(define SKY1 (make-building 100 500 "blue" Skyline))
+;;(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
+;;(define SKY3 (make-building 500 1000 "pink"
+                            ;;(make-building 250 400 "red" (make-building 100 500 "blue" false))))
 
 #;(define (Skyline-temp skah)
   (cond
@@ -315,6 +315,68 @@
 
 ;ex 7
 (define-struct moon [distance mass])
-(define-struct planet [name distance 
-; A Planet is a (make-planet String Number Moon)
-; A Moon is a (make-moon 
+; A Moon is a (make-moon Number Number Planet)
+; and represents a moon orbiting around a planet with
+; a defined distance from the planet and a mass
+(define MOON-1 (make-moon 500 30))
+(define MOON-2 (make-moon 700 120))
+(define MOON-3 (make-moon 900 150))
+(define MOON-4 (make-moon 3000 500))
+(define MOON-5 (make-moon 1000 75))
+(define MOON-6 (make-moon 7000 250))
+
+; moon-temp : Moon -> ???
+#; (define (moon-temp m)
+     (... (moon-distance m)...
+          (moon-mass m)...))
+
+(define-struct planet [name distance firstmoon secondmoon])
+; A Planet is a (make-planet String Number Moon Moon)
+; and represents a named planet in a planetary system
+; a defined distance from the star with two moons
+(define PLANET-1 (make-planet "Joe" 3000000 MOON-1 MOON-2))
+(define PLANET-2 (make-planet "Bill" 1000 MOON-3 MOON-4))
+(define PLANET-3 (make-planet "Earth-2" 800000 MOON-5 MOON-6))
+
+; planet-temp : Planet -> ???
+#; (define (planet-temp p)
+     (... (planet-name p)...
+          (planet-distance p)...
+          (moon-mass (planet-firstmoon p))...
+          (moon-mass (planet-secondmoon p))...))
+
+(define-struct system [planet1 planet2 planet3])
+; A System is a (make-system Planet Planet Planet)
+; and represents a planetary system with three planets
+(define SYSTEM-1 (make-system PLANET-1 PLANET-2 PLANET-3))
+
+; system-temp : System -> ???
+#; (define (system-temp s)
+     (... (system-planet1 s)...
+          (system-planet2 s)...
+          (system-planet3 s)...))
+
+; planet-bigger-moon? : Planet Number -> Boolean
+; returns whether or not a Planet has a Moon with
+; a greater mass than the supplied value
+(check-expect (planet-bigger-moon? PLANET-1 130) false)
+(check-expect (planet-bigger-moon? PLANET-2 300) true)
+(check-expect (planet-bigger-moon? PLANET-3 50) true)
+
+(define (planet-bigger-moon p n)
+  (or
+   (> (moon-mass (planet-firstmoon p)) n)
+   (> (moon-mass (planet-secondmoon p)) n)))
+
+; bigger-moon? : System Number -> Boolean
+; returns whether or not a System has a Planet with a Moon with a greater
+; mass than the supplied value
+(check-expect (bigger-moon? SYSTEM-1 15) true)
+(check-expect (bigger-moon? SYSTEM-1 400) true)
+(check-expect (bigger-moon? SYSTEM-1 1000) false)
+
+(define (bigger-moon? s n)
+  (or
+   (planet-bigger-moon? (system-planet1 s) n)
+   (planet-bigger-moon? (system-planet2 s) n)
+   (planet-bigger-moon? (system-planet3 s) n)))
