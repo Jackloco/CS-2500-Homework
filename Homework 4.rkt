@@ -309,16 +309,87 @@
 ; and represents either an empty skyle or a building with
 ; a width and height in pixels, the color of the building, and the
 ; rest of the skyline to the right of the building
-
-;;(define SKY1 (make-building 100 500 "blue" Skyline))
-;;(define SKY2 (make-building 250 400 "red" (make-building 100 500 "blue" Skyline)))
-;;(define SKY3 (make-building 500 1000 "pink"
-                            ;;(make-building 250 400 "red" (make-building 100 500 "blue" false))))
+(define SKY0 false)
+(define SKY1 (make-building 100 500 "blue" false))
+(define SKY2 (make-building 250 400 "red" SKY1))
+(define SKY3 (make-building 500 1000 "pink" SKY2))
+(define SKY4 (make-building 250 250 "green" SKY3))
+(define SKY5 (make-building 300 300 "orange" false))
+(define SKY6 (make-building 200 200 "purple" SKY5))
 
 #;(define (Skyline-temp skah)
   (cond
     [(false? skah)...]
-    [()]))
+    [(false? (building-right skah)) ...]
+    [else ...]))
+
+; draw-skyline : Skyline -> Image
+; draws the input Skyline
+(check-expect (draw-skyline SKY0) empty-image)
+(check-expect (draw-skyline SKY1) (rectangle 100 500 "solid" "blue"))
+(check-expect (draw-skyline SKY2) (beside/align "bottom"
+                                                (rectangle 250 400 "solid" "red")
+                                                (rectangle 100 500 "solid" "blue")))
+
+(define (draw-skyline s)
+  (if (not (false? s))
+      (beside/align "bottom"
+                    (rectangle (building-width s) (building-height s) "solid" (building-color s))
+                    (draw-skyline (building-right s)))
+      empty-image))
+
+; square-skyline? : Skyline -> Boolean
+; determines if every building in a Skyline is a perfectly square building
+(check-expect (square-skyline? SKY5) true)
+(check-expect (square-skyline? SKY6) true)
+(check-expect (square-skyline? SKY1) false)
+(check-expect (square-skyline? SKY4) false)
+(check-expect (square-skyline? SKY0) true)
+
+(define (square-skyline? s)
+  (if (not (false? s))
+      (and (= (building-width s) (building-height s))
+           (square-skyline? (building-right s)))
+      true))
+
+; doze-red : Skyline -> Skyline
+; produces a Skyline with all "red" buildings removed
+(check-expect (doze-red SKY1) SKY1)
+(check-expect (doze-red SKY2) SKY1)
+(check-expect (doze-red SKY3) (make-building 500 1000 "pink" SKY1))
+(check-expect (doze-red SKY0) SKY0)
+
+(define (doze-red s)
+  (if (not (false? s))
+      (if (string=? "red" (building-color s))
+          (doze-red (building-right s))
+          (make-building (building-width s) (building-height s) (building-color s)
+                         (doze-red (building-right s))))
+      false))
+
+; grow : Skyline PosInteger -> Skyline
+; increases the height of all buildings in the Skyline by a given PosInteger
+(check-expect (grow SKY1 100) (make-building 100 600 "blue" false))
+(check-expect (grow SKY2 50) (make-building 250 450 "red" (make-building 100 550 "blue" false)))
+(check-expect (grow SKY0 200) SKY0)
+
+(define (grow s n)
+  (if (not (false? s))
+      (make-building (building-width s) (+ n (building-height s)) (building-color s)
+                     (grow (building-right s) n))
+      false))
+
+; skyline-height : Skyline -> Number
+; determines the height of the tallest building in a Skyline
+(check-expect (skyline-height SKY0) 0)
+(check-expect (skyline-height SKY1) 500)
+(check-expect (skyline-height SKY2) 500)
+(check-expect (skyline-height SKY4) 1000)
+
+(define (skyline-height s)
+  (if (not (false? s))
+      (max (building-height s) (skyline-height (building-right s)))
+      0))
 
 ;ex 7
 (define-struct moon [distance mass])
