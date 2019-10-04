@@ -318,10 +318,10 @@
 (define SKY6 (make-building 200 200 "purple" SKY5))
 
 #;(define (Skyline-temp skah)
-  (cond
-    [(false? skah)...]
-    [(false? (building-right skah)) ...]
-    [else ...]))
+    (cond
+      [(false? skah)...]
+      [(false? (building-right skah)) ...]
+      [else ...]))
 
 ; draw-skyline : Skyline -> Image
 ; draws the input Skyline
