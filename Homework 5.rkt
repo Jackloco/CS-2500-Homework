@@ -20,12 +20,31 @@
     [(cons? lt)(...(first lt)...
                    (los-temp (rest lt))...)]))
 
+(check-expect (str-in-list-even?/v1 "blue" LOS4) true)
+(check-expect (str-in-list-even?/v1 "red" LOS4) false)
+(check-expect (str-in-list-even?/v1 "yellow" LOS4) true)
+(check-expect (str-in-list-even?/v1 "blue" LOS1) true)
+(check-expect (str-in-list-even?/v1 "red" LOS4) false)
+
+;;zero is an even number
 ;;str-in-list-even?/v1: String LoS -> Boolean
+;;takes in a target string and a list of strings and finds if the target appears even amount of times
+;;in the LoS
 (define (str-in-list-even?/v1 target LoS)
   (cond
     [(empty? LoS) true]
-    [(cons? LoS)(if(string=? target (first lt)) (add1(str-in-list-even?/v1 (rest lt)))
-                   (str-in-list-even?/v1 (rest lt)))]))
+    [(cons? LoS) (= 0 (string-ticker target LoS))]))
+
+;string-ticker: String LoS -> NatNumber
+;takes in the target and list from the function above and helps it by getting the amount of times
+;the string shows up
+(define (string-ticker target LoS)
+  (cond
+    [(empty? LoS) 0]
+    [(cons? LoS)
+     (if(string=? target (first LoS)) (modulo (add1(string-ticker target (rest LoS))) 2)
+        (modulo (string-ticker target (rest LoS)) 2))]))
+
 ;;ex 2
 
 ;;ex 3
