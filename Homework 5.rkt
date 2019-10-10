@@ -46,6 +46,25 @@
         (modulo (string-ticker target (rest LoS)) 2))]))
 
 ;;ex 2
+(check-expect (str-in-list-even?/v2 "blue" LOS4) true)
+(check-expect (str-in-list-even?/v2 "red" LOS4) false)
+(check-expect (str-in-list-even?/v2 "yellow" LOS4) true)
+(check-expect (str-in-list-even?/v2 "blue" LOS1) true)
+(check-expect (str-in-list-even?/v2 "red" LOS4) false)
+;;str-in-list-even?/v2: String LoS -> Boolean
+;;takes in a target string and a list of strings and finds if the target appears even amount of times
+;;in the LoS
+
+(define (str-in-list-even?/v2 target LoS)
+  (cond
+    [(empty? LoS) true]
+    [(cons? LoS) (if (string=? target (first LoS)) (not (str-in-list-even?/v2 target (rest LoS)))
+                                                    (str-in-list-even?/v2 target (rest LoS)))]))
+
+;flipper: Boolean->Boolean
+;takes in boolean and changes it state to the opposite
+(define (flipper flop)
+  (not flop))
 
 ;;ex 3
 
