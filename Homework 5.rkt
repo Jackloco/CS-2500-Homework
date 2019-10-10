@@ -59,7 +59,7 @@
   (cond
     [(empty? LoS) true]
     [(cons? LoS) (if (string=? target (first LoS)) (not (str-in-list-even?/v2 target (rest LoS)))
-                                                    (str-in-list-even?/v2 target (rest LoS)))]))
+                     (str-in-list-even?/v2 target (rest LoS)))]))
 
 (check-expect (flipper false) true)
 (check-expect (flipper true) false)
@@ -79,10 +79,10 @@
 
 (define (lon-temp l)
   (cond
-   [(empty? l)...]
-   [(cons? l)
-    (first l)
-    (lon-temp(rest l))]))
+    [(empty? l)...]
+    [(cons? l)
+     (first l)
+     (lon-temp(rest l))]))
    
 
 ;; Listoflistofnumbers(lolon) is one of:
@@ -105,11 +105,11 @@
 
 ;list-of-lists: LoL-> ???
 #;(define (LoL-temp lol)
-  (cond
-    [(empty? lol)...]
-    [(cons? lol)
-     (lon-temp(first lol))...
-     (LoL-temp(rest lol))...]))
+    (cond
+      [(empty? lol)...]
+      [(cons? lol)
+       (lon-temp(first lol))...
+       (LoL-temp(rest lol))...]))
 
 (check-expect (all-the-nums LoloN-1) 20)
 (check-expect (all-the-nums LoloN-2) 32)
@@ -119,7 +119,7 @@
   (cond [(empty? lolon) 0]
         [(cons? lolon)
          (+ (list-add (first lolon))
-               (all-the-nums (rest lolon)))]))
+            (all-the-nums (rest lolon)))]))
 
 (check-expect (list-add (cons 6 (cons 8 empty))) 14)
 (check-expect (list-add (cons 5 (cons 3 (cons 7 empty)))) 15)
@@ -140,7 +140,7 @@
   (cond [(empty? lolon) empty]
         [(cons? lolon)
          (append (first lolon)
-               (flattens (rest lolon)))]))
+                 (flattens (rest lolon)))]))
 
 ;;ex 5
 
@@ -149,13 +149,36 @@
 ; and represents a slide's title,
 ; what bullets have been shown (top to bottom)
 ; and which are hidden (top to bottom)
+
+(define SLIDE-1 (make-slide ("cheese" (cons "blue" (cons "american" empty))
+                                      (cons "goat" (cons "dairy-free" empty)))))
+(define SLIDE-2 (make-slide ("cars" (cons "honda" (cons "ford" empty))
+                                    (cons "nissan" (cons "lexus" empty)))))
+
+(define (slide-temp st)
+  (slide-title st) ...
+  (los-temp (slide-shown st))...
+  (los-temp (slide-hidden st)...))
  
 ; A Slideshow is one of:
 ; - empty
 ; - (cons Slide Slideshow)
 ; and represents an ordered slideshow
 
+(define SLIDESHOW-1 (empty))
+(define SLIDESHOW-2 (cons SLIDE-1 empty))
+(define SLIDESHOW-3 (cons SLIDE-1 (cons SLIDE-2 empty)))
 
+(define (slideshow-temp st)
+  (cond
+    [(empty? st)...]
+    [(cons? st)
+     (first st)...
+     (slideshow-temp(rest st))...]))
+
+;strong-singularity 
+(define (strong-singularity slideshow)
+  )
 
 ;;ex 6
 
