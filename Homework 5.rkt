@@ -154,6 +154,8 @@
                                       (cons "goat" (cons "dairy-free" empty)))))
 (define SLIDE-2 (make-slide ("cars" (cons "honda" (cons "ford" empty))
                                     (cons "nissan" (cons "lexus" empty)))))
+(define SLIDE-3 (make-slide ("websites" (cons empty)
+                                        (cons "youtube" (cons "facebook" (cons "twitter"))))))
 
 (define (slide-temp st)
   (slide-title st) ...
@@ -168,6 +170,8 @@
 (define SLIDESHOW-1 (empty))
 (define SLIDESHOW-2 (cons SLIDE-1 empty))
 (define SLIDESHOW-3 (cons SLIDE-1 (cons SLIDE-2 empty)))
+(define SLIDESHOW-3 (cons SLIDE-1 (cons SLIDE-2 (cons SLIDE-3 empty))))
+
 
 (define (slideshow-temp st)
   (cond
@@ -176,15 +180,26 @@
      (first st)...
      (slideshow-temp(rest st))...]))
 
-;strong-singularity 
+(define BLACK (rectangle 
+;strong-singularity: World -> World
+;this the big-bang for making a working slideshow
 (define (strong-singularity slideshow)
-  )
+  (big-bang slidshow
+    [to-draw view-slide]
+    [on-key right-key]
+    [stop-when end BLACK]))
 
 ;;ex 6
-
 ;;a
+;a feature is a number from [0, 255]
+;0 is white/off, 1-254 is grey, 255 is black/on
+(define FEATURE-1 0)
+(define FEATURE-2 1)
+(define FEATURE-3 254)
+(define FEATURE-4 255)
 
 ;;b
+;a bitmap
 
 ;;c
 
