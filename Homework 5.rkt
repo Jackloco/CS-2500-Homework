@@ -69,13 +69,29 @@
 (define (flipper flop)
   (not flop))
 
-;; List of list of numbers is one of:
+;ListofNumbers(LoN) is one of:
+;- empty
+;- (cons Number LoN )
+;list of numbers
+
+(define LON-1 (cons 1 (cons 2 (cons 3 empty))))
+(define LON-2 (cons 2 (cons 4 (cons 6 empty))))
+
+(define (lon-temp l)
+  (cond
+   [(empty? l)...]
+   [(cons? l)
+    (first l)
+    (lon-temp(rest l))]))
+   
+
+;; Listoflistofnumbers(lolon) is one of:
 ; - empty
-; - (cons LoN LoLoN)
+; - (cons listofnumbers lolon)
+;one list which is several lists of numbers inside of it
 
 ; (list (1 2) (3 6 8))
 ; (list 1 2 3 6 8)
-; (
 
 ;(cons 1 2)
 ;(cons 1 (cons 2 empty))
@@ -84,20 +100,20 @@
 ;(cons 1 (cons 2 (cons 3 empty)))
 
 ;;ex 3
-(define LoN-1 (cons (cons 1 (cons 2 empty)) (cons (cons 3 (cons 6 (cons 8 empty))) empty)))
-(define LoN-2 (cons (cons 2 (cons 4 empty)) (cons (cons 4 (cons 10 (cons 12 empty))) empty)))
+(define LoloN-1 (cons (cons 1 (cons 2 empty)) (cons (cons 3 (cons 6 (cons 8 empty))) empty)))
+(define LoloN-2 (cons (cons 2 (cons 4 empty)) (cons (cons 4 (cons 10 (cons 12 empty))) empty)))
 
 ;list-of-lists: LoL-> ???
 #;(define (LoL-temp lol)
   (cond
     [(empty? lol)...]
     [(cons? lol)
-     (list-temp(first lol))...
+     (lon-temp(first lol))...
      (LoL-temp(rest lol))...]))
 
-(check-expect (all-the-nums LoN-1) 20)
-(check-expect (all-the-nums LoN-2) 32)
-;all-the-nums: List of Lists -> Number
+(check-expect (all-the-nums LoloN-1) 20)
+(check-expect (all-the-nums LoloN-2) 32)
+;all-the-nums: Lolon -> Number
 ;aggregates all the integers in each list to one number
 (define (all-the-nums lolon)
   (cond [(empty? lolon) 0]
@@ -107,7 +123,7 @@
 
 (check-expect (list-add (cons 6 (cons 8 empty))) 14)
 (check-expect (list-add (cons 5 (cons 3 (cons 7 empty)))) 15)
-;list-add: List->Number
+;list-add: ListofNumbers->Number
 ;gets a list and adds it's insides
 (define(list-add l)
   (cond [(empty? l) 0]
@@ -116,16 +132,39 @@
             (list-add (rest l)))]))
 
 ;;ex 4 
-(check-expect (flattens LoN-1) (cons 1 (cons 2 (cons 3 (cons 6 (cons 8 empty))))))
-(check-expect (flattens LoN-2) (cons 2 (cons 4 (cons 4 (cons 10 (cons 12 empty))))))
-;flattens: List of Lists -> List
+(check-expect (flattens LoloN-1) (cons 1 (cons 2 (cons 3 (cons 6 (cons 8 empty))))))
+(check-expect (flattens LoloN-2) (cons 2 (cons 4 (cons 4 (cons 10 (cons 12 empty))))))
+;flattens: ListofLists -> List
 ;appends an entire list of lists into one list
 (define (flattens lolon)
   (cond [(empty? lolon) empty]
         [(cons? lolon)
-         (string-append (number->string(first lolon))
+         (append (first lolon)
                (flattens (rest lolon)))]))
 
 ;;ex 5
 
+(define-struct slide [title shown hidden])
+; A Slide is a (make-slide String LoS LoS)
+; and represents a slide's title,
+; what bullets have been shown (top to bottom)
+; and which are hidden (top to bottom)
+ 
+; A Slideshow is one of:
+; - empty
+; - (cons Slide Slideshow)
+; and represents an ordered slideshow
+
+
+
 ;;ex 6
+
+;;a
+
+;;b
+
+;;c
+
+;;d
+
+;;e
