@@ -77,12 +77,12 @@
 (define LON-1 (cons 1 (cons 2 (cons 3 empty))))
 (define LON-2 (cons 2 (cons 4 (cons 6 empty))))
 
-(define (lon-temp l)
-  (cond
-    [(empty? l)...]
-    [(cons? l)
-     (first l)
-     (lon-temp(rest l))]))
+#;(define (lon-temp l)
+    (cond
+      [(empty? l)...]
+      [(cons? l)
+       (first l)
+       (lon-temp(rest l))]))
    
 
 ;; Listoflistofnumbers(lolon) is one of:
@@ -150,44 +150,104 @@
 ; what bullets have been shown (top to bottom)
 ; and which are hidden (top to bottom)
 
-(define SLIDE-1 (make-slide ("cheese" (cons "blue" (cons "american" empty))
-                                      (cons "goat" (cons "dairy-free" empty)))))
-(define SLIDE-2 (make-slide ("cars" (cons "honda" (cons "ford" empty))
-                                    (cons "nissan" (cons "lexus" empty)))))
-(define SLIDE-3 (make-slide ("websites" (cons empty)
-                                        (cons "youtube" (cons "facebook" (cons "twitter"))))))
+(define SLIDE-1 (make-slide "cheese" (cons "blue" (cons "american" empty))
+                            (cons "goat" (cons "dairy-free" empty))))
+(define SLIDE-2 (make-slide "cars" (cons "honda" (cons "ford" empty))
+                            (cons "nissan" (cons "lexus" empty))))
+(define SLIDE-3 (make-slide "websites" empty
+                            (cons "youtube" (cons "facebook" (cons "twitter" empty)))))
 
-(define (slide-temp st)
-  (slide-title st) ...
-  (los-temp (slide-shown st))...
-  (los-temp (slide-hidden st)...))
+#;(define (slide-temp st)
+    (slide-title st) ...
+    (los-temp (slide-shown st))...
+    (los-temp (slide-hidden st)...))
  
 ; A Slideshow is one of:
 ; - empty
 ; - (cons Slide Slideshow)
 ; and represents an ordered slideshow
 
-(define SLIDESHOW-1 (empty))
+(define SLIDESHOW-1 empty)
 (define SLIDESHOW-2 (cons SLIDE-1 empty))
-(define SLIDESHOW-3 (cons SLIDE-1 (cons SLIDE-2 empty)))
-(define SLIDESHOW-3 (cons SLIDE-1 (cons SLIDE-2 (cons SLIDE-3 empty))))
-
+(define SLIDESHOW-3 (cons SLIDE-3 (cons SLIDE-1 empty)))
+(define SLIDESHOW-4 (cons SLIDE-1 (cons SLIDE-3 (cons SLIDE-2 empty))))
 
 (define (slideshow-temp st)
   (cond
     [(empty? st)...]
     [(cons? st)
-     (first st)...
-     (slideshow-temp(rest st))...]))
+     (...(slide-temp(first st))
+         (slideshow-temp(rest st)))]))
 
-(define BLACK (rectangle 
-;strong-singularity: World -> World
+(define BLACK (square 500 "solid" "black"))
+;strong-singularity: Slideshow -> Slideshow
 ;this the big-bang for making a working slideshow
 (define (strong-singularity slideshow)
-  (big-bang slidshow
-    [to-draw view-slide]
+  (big-bang slideshow
+    [to-draw draw-slideshow]
     [on-key right-key]
-    [stop-when end BLACK]))
+    ;;[stop-when end BLACK]
+    ))
+
+;;draw-slideshow:Slideshow->Image
+;;takes in slideshow, outputs slide
+(check-expect (draw-slideshow SLIDESHOW-1) BLACK)
+(check-expect (draw-slideshow SLIDESHOW-2) (above (text "cheese" 24 "olive")
+                                                  (text "american" 12 "olive") (text "blue" 12 "olive")))
+(define (draw-slideshow slideshow)
+  (cond
+    [(empty? slideshow) BLACK]
+    [(cons? slideshow)
+     (draw-slide (first slideshow))]))
+
+;;draw-slide: Slide-> Image
+;;draws the current slide singular, uses above needs images to passed up through
+(check-expect (draw-slide SLIDE-1) (above (text "cheese" 24 "olive")
+                                          (text "american" 12 "olive") (text "blue" 12 "olive")))
+(define (draw-slide st)
+  (above(title-print st)
+        (bullet-print(slide-shown st))))
+
+
+;title-print: Slide->Image
+;only prints the title for the current slide
+(check-expect (title-print SLIDE-1) (text "cheese" 24 "olive"))
+(check-expect (title-print SLIDE-2) (text "cars" 24 "olive"))
+
+(define (title-print st)
+  (text (slide-title st) 24 "olive"))
+
+;bullet-print: LoS->Image
+;only prints the shown bullets for the current slide
+(check-expect (bullet-print (cons "blue" (cons "american" empty)))
+              (above(text "american" 12 "olive") (text "blue" 12 "olive")))
+(define (bullet-print lt)
+  (cond
+    [(empty? lt) empty-image]
+    [(cons? lt)
+     (above (bullet-print (rest lt))
+            (text (first lt) 12 "olive"))]))
+;;was told by TA to do this so they can stack correctly pls no bully
+
+;;right-key: Slideshow KeyEvent -> Slideshow
+;;press right key to unveal hidden and next slide in the Slideshow
+(check-expect (right-key SLIDESHOW-1 "right") empty)
+(check-expect (right-key SLIDESHOW-2 "right")
+              (cons (make-slide "cheese" (cons "dairy-free"(cons "blue" (cons "american" empty)))
+                                (cons "goat" empty)) empty))
+(check-expect (right-key SLIDESHOW-2 "left") SLIDESHOW-2)
+(check-expect (right-key SLIDESHOW-3 "right")
+              (cons (make-slide "websites" (cons "twitter" empty)
+                                (cons "youtube" (cons "facebook" empty))))
+              (cons SLIDE-1 empty))
+(define (right-key slideshow ke)
+  )
+
+;end: Slideshow->BLACK
+;when the slideshow is empty, it will end the program and draw for the last scene the black background
+;;(check-expect  (end SLIDESHOW-1) BLACK)
+;;(define (end slideshow)
+;;(empty? slideshow) BLACK)  
 
 ;;ex 6
 ;;a
