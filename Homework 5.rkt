@@ -191,18 +191,45 @@
 
 ;;ex 6
 ;;a
-;a feature is a number from [0, 255]
+
+;a Feature is a number from [0, 255]
+;representing a single pixel in an image
 ;0 is white/off, 1-254 is grey, 255 is black/on
 (define FEATURE-1 0)
 (define FEATURE-2 1)
-(define FEATURE-3 254)
-(define FEATURE-4 255)
+(define FEATURE-3 127)
+(define FEATURE-4 254)
+(define FEATURE-5 255)
 
 ;;b
-;a bitmap
+
+;a Row is one of:
+; - empty
+; - (cons Feature Row)
+;representing all the features in a single row of a bitmap
+(define ROW-0 '())
+(define ROW-1 (cons 254 (cons 255 (cons 255 ROW-0))))
+(define ROW-2 (cons 255 (cons 0 (cons 253 ROW-0))))
+(define ROW-3 (cons 252 (cons 255 (cons 255 ROW-0))))
+
+;a Bitmap is one of:
+; - empty
+; - (cons Row Bitmap)
+;representing all the rows that make up a bitmap image
+;by stacking the rows on top of each other
+(define BITMAP-1 (cons ROW-1 '()))
+(define BITMAP-2 (cons ROW-2 BITMAP-1))
+(define BITMAP-3 (cons ROW-3 BITMAP-2))
 
 ;;c
 
+;an Instance is one of:
+; - empty
+; - (cons Row Instance)
+;representing all the features that make up a bitmap image in a single row
+(define INSTANCE-1 (cons ROW-1 (cons ROW-2 (cons ROW-3 '()))))
+
 ;;d
+
 
 ;;e
