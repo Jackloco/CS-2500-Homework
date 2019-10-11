@@ -156,6 +156,7 @@
                             (cons "nissan" (cons "lexus" empty))))
 (define SLIDE-3 (make-slide "websites" empty
                             (cons "youtube" (cons "facebook" (cons "twitter" empty)))))
+(define SLIDE-4 (make-slide "sports" (cons "rugby" (cons "football" (cons "soccer" empty))) empty))
 
 #;(define (slide-temp st)
     (slide-title st) ...
@@ -171,6 +172,7 @@
 (define SLIDESHOW-2 (cons SLIDE-1 empty))
 (define SLIDESHOW-3 (cons SLIDE-3 (cons SLIDE-1 empty)))
 (define SLIDESHOW-4 (cons SLIDE-1 (cons SLIDE-3 (cons SLIDE-2 empty))))
+(define SLIDESHOW-5 (cons SLIDE-4 (cons SLIDE-3 (cons SLIDE-2 empty))))
 
 (define (slideshow-temp st)
   (cond
@@ -185,17 +187,17 @@
 ;this the big-bang for making a working slideshow
 (define (strong-singularity slideshow)
   (empty?(big-bang slideshow
-    [to-draw draw-slideshow]
-    [on-key right-key]
-    [stop-when end draw-end-background]
-    )))
+           [to-draw draw-slideshow]
+           [on-key right-key]
+           [stop-when end draw-end-background]
+           )))
 
 ;;draw-slideshow:Slideshow->Image
 ;;takes in slideshow, outputs slide
 (check-expect (draw-slideshow SLIDESHOW-1) BLACK)
 (check-expect (draw-slideshow SLIDESHOW-2)
               (overlay (above (text "cheese" 24 "olive")
-                     (text "american" 12 "olive") (text "blue" 12 "olive")) BACKGROUND))
+                              (text "american" 12 "olive") (text "blue" 12 "olive")) BACKGROUND))
 (define (draw-slideshow slideshow)
   (cond
     [(empty? slideshow) BLACK]
@@ -249,7 +251,18 @@
     [else slideshow]))
 
 ;showey: Slideshow->Slideshow
-;only if right is clicked will the slideshow be checked if it is anything
+;only if right is clicked will the slideshow be checked in this function if it is anything
+(check-expect(showey SLIDESHOW-1) empty)
+(check-expect(showey SLIDESHOW-2)
+             (cons(make-slide "cheese"(cons "goat"(cons "blue"(cons "american" empty)))
+                              (cons "dairy-free" empty)) empty))
+(check-expect
+ (showey SLIDESHOW-5)
+ (cons (make-slide  "websites" empty(cons "youtube" (cons "facebook"
+                                                          (cons "twitter" empty))))
+       (cons (make-slide "cars" (cons "honda" (cons "ford" empty)) (cons "nissan"
+                                                                         (cons "lexus" empty)))
+             empty)))
 (define (showey sl)
   (cond
     [(empty? sl) empty]
@@ -257,14 +270,21 @@
                    (rest sl) (cons (change-bullets (first sl)) (rest sl)))]))
 
 ;slide-empty? Slide-> Boolean
-;checks if the slide has any hidden bullets
-(check-expect())
+;checks if the slide doesn't have any hidden bullets
+(check-expect (slide-empty? SLIDE-2) false)
+(check-expect (slide-empty? SLIDE-1) false)
+(check-expect (slide-empty? SLIDE-4) true)
 (define (slide-empty? rs)
   (empty?(slide-hidden rs)))
 
 ;change-bullets: Slide->Slide
 ;only changes the bullets of the current slide
-(check-expect())
+(check-expect(change-bullets SLIDE-2)
+             (make-slide "cars" (cons "nissan" (cons "honda" (cons "ford" empty)))
+                         (cons "lexus" empty)))
+(check-expect(change-bullets SLIDE-3)
+             (make-slide "websites" (cons "youtube" empty)
+                         (cons "facebook" (cons "twitter" empty))))
 (define (change-bullets cb)
   (make-slide (slide-title cb)
               (cons (first(slide-hidden cb)) (slide-shown cb)) (rest(slide-hidden cb))))
@@ -277,7 +297,11 @@
 (define (end slideshow)
   (empty? slideshow))
 
-;draw-end-background: Slideshow
+;draw-end-background: Slideshow-> Image
+;the stop when function wasn't working correctly so i had to make this to make a black end
+;;willow told me to do this
+(check-expect(draw-end-background SLIDESHOW-1) BLACK)
+(check-expect(draw-end-background SLIDESHOW-2) BLACK)
 (define (draw-end-background _)
   BLACK)
 
