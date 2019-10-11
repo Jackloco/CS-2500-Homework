@@ -258,11 +258,13 @@
 
 ;slide-empty? Slide-> Boolean
 ;checks if the slide has any hidden bullets
+(check-expect())
 (define (slide-empty? rs)
   (empty?(slide-hidden rs)))
 
 ;change-bullets: Slide->Slide
 ;only changes the bullets of the current slide
+(check-expect())
 (define (change-bullets cb)
   (make-slide (slide-title cb)
               (cons (first(slide-hidden cb)) (slide-shown cb)) (rest(slide-hidden cb))))
