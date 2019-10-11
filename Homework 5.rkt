@@ -180,25 +180,27 @@
          (slideshow-temp(rest st)))]))
 
 (define BLACK (square 500 "solid" "black"))
+(define BACKGROUND (square 500 "solid" "white"))
 ;strong-singularity: Slideshow -> Slideshow
 ;this the big-bang for making a working slideshow
 (define (strong-singularity slideshow)
-  (big-bang slideshow
+  (empty?(big-bang slideshow
     [to-draw draw-slideshow]
     [on-key right-key]
-    ;;[stop-when end BLACK]
-    ))
+    [stop-when end draw-end-background]
+    )))
 
 ;;draw-slideshow:Slideshow->Image
 ;;takes in slideshow, outputs slide
 (check-expect (draw-slideshow SLIDESHOW-1) BLACK)
-(check-expect (draw-slideshow SLIDESHOW-2) (above (text "cheese" 24 "olive")
-                                                  (text "american" 12 "olive") (text "blue" 12 "olive")))
+(check-expect (draw-slideshow SLIDESHOW-2)
+              (overlay (above (text "cheese" 24 "olive")
+                     (text "american" 12 "olive") (text "blue" 12 "olive")) BACKGROUND))
 (define (draw-slideshow slideshow)
   (cond
     [(empty? slideshow) BLACK]
     [(cons? slideshow)
-     (draw-slide (first slideshow))]))
+     (overlay (draw-slide (first slideshow)) BACKGROUND)]))
 
 ;;draw-slide: Slide-> Image
 ;;draws the current slide singular, uses above needs images to passed up through
@@ -233,21 +235,49 @@
 ;;press right key to unveal hidden and next slide in the Slideshow
 (check-expect (right-key SLIDESHOW-1 "right") empty)
 (check-expect (right-key SLIDESHOW-2 "right")
-              (cons (make-slide "cheese" (cons "dairy-free"(cons "blue" (cons "american" empty)))
-                                (cons "goat" empty)) empty))
+              (cons (make-slide "cheese" (cons "goat"(cons "blue" (cons "american" empty)))
+                                (cons "dairy-free" empty)) empty))
 (check-expect (right-key SLIDESHOW-2 "left") SLIDESHOW-2)
 (check-expect (right-key SLIDESHOW-3 "right")
-              (cons (make-slide "websites" (cons "twitter" empty)
-                                (cons "youtube" (cons "facebook" empty))))
-              (cons SLIDE-1 empty))
+              (cons (make-slide "websites" (cons "youtube" empty)
+                                (cons "facebook" (cons "twitter" empty)))
+                    (cons SLIDE-1 empty)))
+
 (define (right-key slideshow ke)
-  )
+  (cond
+    [(key=? ke "right")(showey slideshow)]
+    [else slideshow]))
+
+;showey: Slideshow->Slideshow
+;only if right is clicked will the slideshow be checked if it is anything
+(define (showey sl)
+  (cond
+    [(empty? sl) empty]
+    [(cons? sl) (if(slide-empty? (first sl))
+                   (rest sl) (cons (change-bullets (first sl)) (rest sl)))]))
+
+;slide-empty? Slide-> Boolean
+;checks if the slide has any hidden bullets
+(define (slide-empty? rs)
+  (empty?(slide-hidden rs)))
+
+;change-bullets: Slide->Slide
+;only changes the bullets of the current slide
+(define (change-bullets cb)
+  (make-slide (slide-title cb)
+              (cons (first(slide-hidden cb)) (slide-shown cb)) (rest(slide-hidden cb))))
 
 ;end: Slideshow->BLACK
 ;when the slideshow is empty, it will end the program and draw for the last scene the black background
-;;(check-expect  (end SLIDESHOW-1) BLACK)
-;;(define (end slideshow)
-;;(empty? slideshow) BLACK)  
+(check-expect  (end SLIDESHOW-1) true)
+(check-expect  (end SLIDESHOW-2) false)
+(check-expect  (end SLIDESHOW-3) false)
+(define (end slideshow)
+  (empty? slideshow))
+
+;draw-end-background: Slideshow
+(define (draw-end-background _)
+  BLACK)
 
 ;;ex 6
 ;;a
