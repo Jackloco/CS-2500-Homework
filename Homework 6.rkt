@@ -11,7 +11,7 @@
 (define (distance-to-origin p)
   (sqrt (+ (sqr (posn-x p)) (sqr (posn-y p)))))
 
-; map1 : [List-of Posn] Number Function Function -> Number
+; map1 : [List-of Posn] Number [Number Number -> Number] [Posn -> Number] -> Number
 ; either sums all the x-coordinates in a List of Positions
 ; or multiplies all the distances from each position to the origin
 (define LOP-1 (cons (make-posn 3 4) (cons (make-posn 5 12) empty)))
@@ -64,6 +64,10 @@
   (map1 lop 0 max difference-of-posn))
 
 ;ex 2
+
+; my-animate : [Number -> Image] ->
+(define (my-animate )
+  (big-bang x
 
 ;ex 3
 
