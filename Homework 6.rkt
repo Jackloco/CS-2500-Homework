@@ -5,6 +5,7 @@
 ;a
 
 ;b
+(define (biggest-difference ))
 
 ;ex 2
 
