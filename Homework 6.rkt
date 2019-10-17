@@ -65,10 +65,35 @@
 
 ;ex 2
 
-; my-animate : [Number -> Image] ->
-(define (my-animate )
-  (big-bang x
+(define SKY-WIDTH 300)
+(define SKY-HEIGHT 200)
+(define RADIUS 25)
+(define SUN (circle RADIUS "solid" "yellow"))
+(define MOON (circle RADIUS "solid" "grey"))
+(define SKY (rectangle SKY-WIDTH SKY-HEIGHT "solid" "light blue"))
+; eclipse : Number -> Image
+; draws a moon at a given x position in the sky
+(define (eclipse x-moon)
+  (place-image MOON
+               x-moon (/ SKY-HEIGHT 2)
+               (place-image SUN (/ SKY-WIDTH 2) (/ SKY-HEIGHT 2) SKY)))
+
+; my-animate : [Number -> Image] -> Number
+; animates the provided function by changing the image every frame
+(define (my-animate f)
+  (big-bang 0
+    [to-draw f]
+    [on-tick add1]))
 
 ;ex 3
+
+; a NonEmptyListOfStrings is a
+; (cons String ListOfStrings)
+; representing any ListOfStrings that is not empty
+(define NELOS-1 (cons "hello" '()))
+(define NELOS-2 ())
+
+; earliest : NonEmptyListOfStrings [String String -> Boolean] -> String
+; takes a non-empty ListOfStrings and a function that returns if the first string comes 
 
 ;ex 4
