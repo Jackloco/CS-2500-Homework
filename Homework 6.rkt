@@ -1,6 +1,9 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |Homework 6|) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "itunes.rkt" "teachpack" "2htdp") (lib "web-io.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp") (lib "abstraction.rkt" "teachpack" "2htdp") (lib "batch-io.rkt" "teachpack" "2htdp") (lib "itunes.rkt" "teachpack" "2htdp") (lib "web-io.rkt" "teachpack" "2htdp")) #t)))
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname |Homework 6|) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(require 2htdp/image)
+(require 2htdp/universe)
+
 ;ex 1
 ;a
 
@@ -90,10 +93,46 @@
 ; a NonEmptyListOfStrings is a
 ; (cons String ListOfStrings)
 ; representing any ListOfStrings that is not empty
-(define NELOS-1 (cons "hello" '()))
-(define NELOS-2 ())
+(define NELOS-1 (cons "goodbye" '()))
+(define NELOS-2 (cons "hello" NELOS-1))
+(define NELOS-3 (cons "apple" NELOS-2))
+(define NELOS-4 (cons "banana" NELOS-3))
+#; (define (nelos-temp nelos)
+     (... (first nelos)...
+          (nelos-temp (rest nelos))...))
 
 ; earliest : NonEmptyListOfStrings [String String -> Boolean] -> String
-; takes a non-empty ListOfStrings and a function that returns if the first string comes 
+; takes a non-empty ListOfStrings and a function that returns if the first string comes "before" the
+; second in the non-empty ListOfStrings
+(check-expect (earliest NELOS-4 string<?) "apple")
+(check-expect (earliest NELOS-4 string>?) "hello")
+(check-expect (earliest NELOS-4 string=?) "goodbye")
+
+(define (earliest los f)
+ (cond
+   [(empty? (rest los)) (first los)]
+   [(f (first los) (earliest (rest los) f)) (first los)]
+   [else (earliest (rest los) f)]))
+
+; earliest-lex : NonEmptyListOfStrings -> String
+; determines the string that comes first lexographically
+(check-expect (earliest-lex NELOS-4) "apple")
+(check-expect (earliest-lex (cons "red" (cons "green" (cons "blue" '())))) "blue")
+(define (earliest-lex los)
+  (earliest los string<?))
+
+; last-lex : NonEmptyListOfStrings -> String
+; determines the string that comes last lexographically
+(check-expect (last-lex NELOS-4) "hello")
+(check-expect (last-lex (cons "z" (cons "b" (cons "y" '())))) "z")
+(define (last-lex los)
+  (earliest los string>?))
+
+; last-string : NonEmptyListOfStrings -> String
+; returns the final string in the list
+(check-expect (last-string (cons "apple" (cons "apple" (cons "banana" '())))) "banana")
+(check-expect (last-string NELOS-3) "goodbye")
+(define (last-string los)
+  (earliest los string=?))
 
 ;ex 4
