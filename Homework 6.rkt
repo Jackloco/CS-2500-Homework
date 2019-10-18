@@ -136,3 +136,68 @@
   (earliest los string=?))
 
 ;ex 4
+
+(define-struct cup [oz color material])
+; A Cup is a (make-cup NonNegNumber String String)
+; and represents a cup's capacity in fluid ounces, color, and material
+(define CUP1 (make-cup 10 "brown" "wood"))
+(define CUP2 (make-cup 8 "brown" "ceramic"))
+(define CUP3 (make-cup 10 "red" "plastic"))
+(define CUP4 (make-cup 6 "clear" "plastic")) 
+(define CUPS
+  (cons CUP1
+        (cons CUP2
+              (cons CUP3
+                    (cons CUP4 empty)))))
+
+; A StringOrNumber is one of:
+; - String
+; - Number
+
+(define-struct bin [key items])
+; A Bin is a (make-bin StringOrNumber [ListOfX])
+; and represents a bin holding all the items matching its key
+(define BIN-BROWN (make-bin "brown" (cons CUP1 (cons CUP2 empty))))
+(define BIN-RED (make-bin "red" (cons CUP3 empty)))
+(define BIN-CLEAR (make-bin "clear" (cons CUP4 empty)))
+(define BIN-10 (make-bin 10 (cons CUP1 (cons CUP3 empty))))
+(define BIN-8 (make-bin 8 (cons CUP2 empty)))
+(define BIN-6 (make-bin 6 (cons CUP4 empty)))
+
+; A ListOfBins is one of:
+; - (cons Bin ListOfBins)
+; - empty
+(define LOB-COLOR (cons BIN-BROWN (cons BIN-RED (cons BIN-CLEAR empty))))
+(define LOB-OZ (cons BIN-8 (cons BIN-10 (cons BIN-6 empty))))
+
+; bin-already-exist? : [ListOfX] [X -> Y] [Y Y -> Boolean] StringOrNumber -> Boolean
+; determines if a bin for a certain key already exists
+(check-expect (bin-already-exist? CUPS cup-color string=? "blue") false)
+(check-expect (bin-already-exist? CUPS cup-oz = 6) true)
+(define (bin-already-exist? lox ke eqr key)
+  (cond
+    [(empty? lox) false]
+    [(cons? lox) (or (eqr key (ke (first lox))) (bin-already-exist? (rest lox) ke eqr key))]))
+
+; add-item-to-bin : [ListOfBin] X [X -> Y] [Y Y -> Boolean] -> [ListOfBin]
+; adds an item to the correct existing bin based on its key
+(check-expect (add-item-to-bin (cons (make-bin "brown" (cons CUP2 empty))
+                                     (cons BIN-RED empty)) CUP1 cup-color string=?)
+              (cons BIN-BROWN (cons BIN-RED empty)))
+(define (add-item-to-bin lob item ke eqr)
+  (cond
+    [(eqr (bin-key (first lob)) (ke item))
+     (cons (make-bin (ke item) (cons item (bin-items (first lob)))) (rest lob))]
+    [else (cons (first lob) (add-item-to-bin (rest lob) item ke eqr))]))
+  
+; create-binning : [ListOfX] [X -> Y] [Y Y -> Boolean] -> [ListOfBin]
+; "bins" items in the list based on a key determined by the two functions
+(check-expect (create-binning CUPS cup-color string=?) LOB-COLOR)
+(check-expect (create-binning CUPS cup-oz =) LOB-OZ)
+(define (create-binning lox ke eqr)
+  (cond
+    [(empty? lox) empty]
+    [(not (bin-already-exist? (rest lox) ke eqr (ke (first lox))))
+     (cons (make-bin (ke (first lox)) (cons (first lox) empty)) (create-binning (rest lox) ke eqr))]
+    [(bin-already-exist? (rest lox) ke eqr (ke (first lox)))
+     (add-item-to-bin (create-binning (rest lox) ke eqr) (first lox) ke eqr)]))
