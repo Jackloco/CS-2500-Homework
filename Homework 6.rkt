@@ -109,10 +109,10 @@
 (check-expect (earliest NELOS-4 string=?) "goodbye")
 
 (define (earliest los f)
- (cond
-   [(empty? (rest los)) (first los)]
-   [(f (first los) (earliest (rest los) f)) (first los)]
-   [else (earliest (rest los) f)]))
+  (cond
+    [(empty? (rest los)) (first los)]
+    [(f (first los) (earliest (rest los) f)) (first los)]
+    [else (earliest (rest los) f)]))
 
 ; earliest-lex : NonEmptyListOfStrings -> String
 ; determines the string that comes first lexographically
